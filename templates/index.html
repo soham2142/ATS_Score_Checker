@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ATS Resume Checker</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <!-- ===== ANALYSIS SCREEN ===== -->
+    <div id="analysisScreen" class="analysis hidden">
+      <div class="analysis-box">
+        <div class="left-skeleton">
+          <h3>Your Score</h3>
+          <div class="circle-skeleton"></div>
+          <div class="line-skeleton"></div>
+          <div class="line-skeleton"></div>
+          <div class="line-skeleton"></div>
+        </div>
+
+        <div class="steps">
+          <div class="step" id="step1">Parsing your resume</div>
+          <div class="step" id="step2">Analyzing job requirements</div>
+          <div class="step" id="step3">Matching skills & experience</div>
+          <div class="step" id="step4">Generating improvement tips</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="app">
+      {% if show_report %}
+      <!-- ===== SCORE SIDEBAR ===== -->
+      <aside class="sidebar">
+        <h3>Your Score</h3>
+
+        <div class="score-wrapper">
+          <svg class="progress-ring" width="140" height="140">
+            <circle class="progress-ring__bg" cx="70" cy="70" r="60" />
+            <circle
+              class="progress-ring__circle"
+              cx="70"
+              cy="70"
+              r="60"
+              stroke-width="10"
+              data-score="{{ score }}"
+              stroke-dasharray="377"
+              stroke-dashoffset="377"
+            />
+          </svg>
+
+          <div class="score-text">
+            <span id="scoreValue">0</span>
+            <small>/100</small>
+          </div>
+        </div>
+      </aside>
+      {% endif %}
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <main class="content">
+        <!-- Upload -->
+        <section class="card">
+          <h2>Upload Resume</h2>
+          <form method="POST" enctype="multipart/form-data" id="resumeForm">
+            <input type="file" name="resume" required />
+            <textarea
+              name="jd"
+              placeholder="Paste Job Description..."
+              required
+            ></textarea>
+            <button type="submit">Check ATS Score</button>
+          </form>
+        </section>
+
+        {% if show_report %}
+
+        <!-- ATS Parse -->
+        <section class="card success">
+          <h2>ATS Parse Rate</h2>
+          <p>✅ Your resume was successfully parsed by ATS systems.</p>
+        </section>
+
+        <!-- Detailed Feedback -->
+        {% for item in feedback %}
+        <section class="card warning">
+          <h2>{{ item.title }}</h2>
+          <p>{{ item.message }}</p>
+
+          {% if item.details %}
+          <p><strong>Missing / weak areas:</strong></p>
+          <ul>
+            {% for d in item.details %}
+            <li>{{ d }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+
+          <div class="suggestion-box">
+            💡 <strong>How to improve:</strong> {{ item.suggestion }}
+          </div>
+        </section>
+        {% endfor %} {% endif %}
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
